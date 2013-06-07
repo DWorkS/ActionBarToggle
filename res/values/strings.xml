@@ -1,0 +1,4 @@
+<resources>
+    <string name="pane_open">Open pane</string>
+    <string name="pane_close">Close pane</string>
+</resources>
