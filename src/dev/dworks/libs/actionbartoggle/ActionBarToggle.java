@@ -167,6 +167,7 @@ public class ActionBarToggle implements DrawerListener, PanelSlideListener {
         	view_type = TYPE.Slider;
             mSlidingPaneLayout = (SlidingPaneLayout) layout;
             mDrawerLayout = null;
+            mDrawerIndicatorEnabled = !mSlidingPaneLayout.isSlideable();
         }
         else if(layout instanceof DrawerLayout){
         	view_type = TYPE.Drawer;
@@ -192,7 +193,7 @@ public class ActionBarToggle implements DrawerListener, PanelSlideListener {
     protected boolean isViewOpen(){
     	switch (view_type) {
 		case Slider:
-			return !mSlidingPaneLayout.isOpen();
+			return mSlidingPaneLayout.isOpen();
 			
 		case Drawer:
         	return mDrawerLayout.isDrawerOpen(GravityCompat.START);
@@ -327,6 +328,9 @@ public class ActionBarToggle implements DrawerListener, PanelSlideListener {
         // Reload drawables that can change with configuration
         mThemeImage = IMPL.getThemeUpIndicator(mActivity);
         mDrawerImage = mActivity.getResources().getDrawable(mDrawerImageResource);
+        if(null != mSlidingPaneLayout){
+        	mDrawerIndicatorEnabled = !mSlidingPaneLayout.isSlideable();
+        }
         syncState();
     }
 
