@@ -1,8 +1,8 @@
 ActionBarToggle
 ==========
 
-ActionBarToggle is modified version ActionBarDrawerToggle which can be used with ActionBarSherlock 
-and also not just DraweLayout but also SlidingPaneLayout
+`ActionBarToggle` is modified version `ActionBarDrawerToggle` which can be used with `ActionBarSherlock` 
+and also not just `DrawerLayout` but also `SlidingPaneLayout`
 
 ## Supported Views
 
@@ -11,6 +11,11 @@ ActionBarToggle has in-built support for:
  * DrawerLayout
  * SlidingPaneLayout
  * No View (just want the new glyph to replace the up carot)
+
+## Sample App
+
+[![Get it on Google Play](http://www.android.com/images/brand/get_it_on_play_logo_small.png)](http://play.google.com/store/apps/details?id=dev.dworks.libs.actionbartoggle.demo)
+
 
 Developed By
 ============
