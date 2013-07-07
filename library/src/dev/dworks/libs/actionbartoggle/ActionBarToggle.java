@@ -138,7 +138,8 @@ public class ActionBarToggle implements DrawerListener, PanelSlideListener {
     private final TYPE view_type;
     private enum TYPE {
     	Drawer,
-    	Slider
+    	Slider,
+    	View
     }
 
     /**
@@ -175,7 +176,7 @@ public class ActionBarToggle implements DrawerListener, PanelSlideListener {
         	mDrawerLayout = (DrawerLayout) layout;
         }
         else{
-        	view_type = null;
+        	view_type = TYPE.View;
         	mSlidingPaneLayout = null;
         	mDrawerLayout = null;
         }
@@ -193,7 +194,7 @@ public class ActionBarToggle implements DrawerListener, PanelSlideListener {
     protected boolean isViewOpen(){
     	switch (view_type) {
 		case Slider:
-			return mSlidingPaneLayout.isOpen();
+			return !mSlidingPaneLayout.isOpen();
 			
 		case Drawer:
         	return mDrawerLayout.isDrawerOpen(GravityCompat.START);
@@ -212,7 +213,11 @@ public class ActionBarToggle implements DrawerListener, PanelSlideListener {
 		return true;
     }
     
-    protected void openView(){
+    public void slideView(View panel, float slideOffset){
+    	onViewSlide(panel, slideOffset);
+    }
+    
+    public void openView(){
     	switch (view_type) {
 		case Slider:
 			mSlidingPaneLayout.openPane();
@@ -224,7 +229,7 @@ public class ActionBarToggle implements DrawerListener, PanelSlideListener {
 		}
     }
     
-    protected void closeView(){
+    public void closeView(){
     	switch (view_type) {
 		case Slider:
 			mSlidingPaneLayout.closePane();
@@ -283,6 +288,10 @@ public class ActionBarToggle implements DrawerListener, PanelSlideListener {
                     mSlider, isViewOpen() ?
                     mOpenDrawerContentDescRes : mCloseDrawerContentDescRes);
         }
+        else {
+            mSetIndicatorInfo = IMPL.setActionBarUpIndicator(mSetIndicatorInfo,
+                    mActivity, mThemeImage, 0);
+        }
     }
 
     /**
@@ -328,7 +337,7 @@ public class ActionBarToggle implements DrawerListener, PanelSlideListener {
         // Reload drawables that can change with configuration
         mThemeImage = IMPL.getThemeUpIndicator(mActivity);
         mDrawerImage = mActivity.getResources().getDrawable(mDrawerImageResource);
-        if(null != mSlidingPaneLayout){
+        if(view_type == TYPE.Slider){
         	mDrawerIndicatorEnabled = !mSlidingPaneLayout.isSlideable();
         }
         syncState();
