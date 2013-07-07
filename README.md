@@ -1,8 +1,16 @@
 ActionBarToggle
 ==========
 
-ActionBarToggle for both DrawerLayout and SlidingPaneLayout
+ActionBarToggle is modified version ActionBarDrawerToggle which can be used with ActionBarSherlock 
+and also not just DraweLayout but also SlidingPaneLayout
 
+## Supported Views
+
+ActionBarToggle has in-built support for:
+
+ * DrawerLayout
+ * SlidingPaneLayout
+ * No View (just want the new glyph to replace the up carot)
 
 Developed By
 ============
