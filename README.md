@@ -1,5 +1,6 @@
 ActionBarToggle
 ==========
+![ActionBarToggle](https://github.com/DWorkS/ActionBarToggle/raw/master/header.png)
 
 `ActionBarToggle` is modified version `ActionBarDrawerToggle` which can be used with `ActionBarSherlock` 
 and also not just `DrawerLayout` but also `SlidingPaneLayout`
