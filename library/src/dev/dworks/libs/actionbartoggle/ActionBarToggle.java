@@ -199,7 +199,7 @@ public class ActionBarToggle implements DrawerListener, PanelSlideListener {
 		case Drawer:
         	return mDrawerLayout.isDrawerOpen(GravityCompat.START);
 		}
-		return true;
+		return false;
     }
     
     protected boolean isViewOpenForOptions(){
@@ -210,7 +210,7 @@ public class ActionBarToggle implements DrawerListener, PanelSlideListener {
 		case Drawer:
 			return mDrawerLayout.isDrawerOpen(GravityCompat.START);
 		}
-		return true;
+		return false;
     }
     
     public void slideView(View panel, float slideOffset){

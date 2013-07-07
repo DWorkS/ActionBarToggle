@@ -29,6 +29,9 @@
             android:name=".SlidingPaneLayoutActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
             android:label="@string/activity_slidingpane_ayout" />
+        <activity
+            android:name=".ViewActivity"
+            android:label="@string/activity_view" />
     </application>
 
 </manifest>
