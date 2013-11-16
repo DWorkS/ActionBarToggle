@@ -18,12 +18,12 @@ package dev.dworks.libs.actionbartoggle.demo;
 
 import java.util.Locale;
 
-import android.app.Fragment;
-import android.app.FragmentManager;
 import android.app.SearchManager;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.SlidingPaneLayout;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,12 +34,12 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 
 import dev.dworks.libs.actionbartoggle.ActionBarToggle;
 
 
-public class SlidingPaneLayoutActivity extends SherlockActivity {
+public class SlidingPaneLayoutActivity extends SherlockFragmentActivity {
     private SlidingPaneLayout mSlidingPaneLayout;
     private ListView mSliderList;
     private ActionBarToggle mActionBarToggle;
@@ -100,7 +100,7 @@ public class SlidingPaneLayoutActivity extends SherlockActivity {
 
     @Override
     public boolean onCreateOptionsMenu(com.actionbarsherlock.view.Menu menu) {
-    	getSupportMenuInflater().inflate(R.menu.main, menu);
+    	getSupportMenuInflater().inflate(R.menu.search, menu);
     	return super.onCreateOptionsMenu(menu);
     }
 
@@ -153,7 +153,7 @@ public class SlidingPaneLayoutActivity extends SherlockActivity {
         args.putInt(PlanetFragment.ARG_PLANET_NUMBER, position);
         fragment.setArguments(args);
 
-        FragmentManager fragmentManager = getFragmentManager();
+        FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
 
         // update selected item and title, then close the slider
@@ -165,7 +165,7 @@ public class SlidingPaneLayoutActivity extends SherlockActivity {
     @Override
     public void setTitle(CharSequence title) {
         mTitle = title;
-        getSupportActionBar().setTitle(mTitle);
+        //getSupportActionBar().setTitle(mTitle);
     }
 
     /**
