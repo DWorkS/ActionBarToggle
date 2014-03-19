@@ -23,5 +23,4 @@
     android:paddingLeft="16dp"
     android:paddingRight="16dp"
     android:textColor="#fff"
-    android:background="?attr/activatedBackgroundIndicator"
     android:minHeight="48dp"/>

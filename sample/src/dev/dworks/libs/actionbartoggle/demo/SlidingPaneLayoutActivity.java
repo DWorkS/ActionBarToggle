@@ -25,7 +25,10 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.SlidingPaneLayout;
+import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -33,13 +36,10 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
-
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-
 import dev.dworks.libs.actionbartoggle.ActionBarToggle;
 
 
-public class SlidingPaneLayoutActivity extends SherlockFragmentActivity {
+public class SlidingPaneLayoutActivity extends ActionBarActivity {
     private SlidingPaneLayout mSlidingPaneLayout;
     private ListView mSliderList;
     private ActionBarToggle mActionBarToggle;
@@ -99,13 +99,13 @@ public class SlidingPaneLayoutActivity extends SherlockFragmentActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(com.actionbarsherlock.view.Menu menu) {
-    	getSupportMenuInflater().inflate(R.menu.search, menu);
+    public boolean onCreateOptionsMenu(Menu menu) {
+    	getMenuInflater().inflate(R.menu.search, menu);
     	return super.onCreateOptionsMenu(menu);
     }
 
     @Override
-    public boolean onPrepareOptionsMenu(com.actionbarsherlock.view.Menu menu) {
+    public boolean onPrepareOptionsMenu(Menu menu) {
         // If the sliding pane is open, hide action items related to the content view
         boolean drawerOpen = mSlidingPaneLayout.isOpen();
         menu.findItem(R.id.action_websearch).setVisible(!drawerOpen);
@@ -113,8 +113,7 @@ public class SlidingPaneLayoutActivity extends SherlockFragmentActivity {
     }
     
     @Override
-    public boolean onOptionsItemSelected(
-    		com.actionbarsherlock.view.MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item) {
         // The action bar home/up action should open or close the drawer.
         // ActionBarDrawerToggle will take care of this.
        if (mActionBarToggle.onOptionsItemSelected(item)) {

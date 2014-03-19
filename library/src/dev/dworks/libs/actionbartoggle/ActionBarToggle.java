@@ -28,6 +28,7 @@ import android.graphics.Rect;
 import android.graphics.Region;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.DrawerLayout.DrawerListener;
@@ -60,6 +61,42 @@ import android.view.ViewGroup;
  */
 public class ActionBarToggle implements DrawerListener, PanelSlideListener {
 
+    /**
+     * Allows an implementing Activity to return an {@link ActionBarDrawerToggle.Delegate} to use
+     * with ActionBarDrawerToggle.
+     */
+    public interface DelegateProvider {
+
+        /**
+         * @return Delegate to use for ActionBarDrawableToggles, or null if the Activity
+         *         does not wish to override the default behavior.
+         */
+        Delegate getDrawerToggleDelegate();
+    }
+
+    public interface Delegate {
+        /**
+         * @return Up indicator drawable as defined in the Activity's theme, or null if one is not
+         *         defined.
+         */
+        Drawable getThemeUpIndicator();
+
+        /**
+         * Set the Action Bar's up indicator drawable and content description.
+         *
+         * @param upDrawable     - Drawable to set as up indicator
+         * @param contentDescRes - Content description to set
+         */
+        void setActionBarUpIndicator(Drawable upDrawable, int contentDescRes);
+
+        /**
+         * Set the Action Bar's up indicator content description.
+         *
+         * @param contentDescRes - Content description to set
+         */
+        void setActionBarDescription(int contentDescRes);
+    }
+
     private interface ActionBarDrawerToggleImpl {
         Drawable getThemeUpIndicator(Activity activity);
         Object setActionBarUpIndicator(Object info, Activity activity,
@@ -67,24 +104,23 @@ public class ActionBarToggle implements DrawerListener, PanelSlideListener {
         Object setActionBarDescription(Object info, Activity activity, int contentDescRes);
     }
 
-
-    private static class ActionBarDrawerToggleImplCompat implements ActionBarDrawerToggleImpl {
+    private static class ActionBarDrawerToggleImplBase implements ActionBarDrawerToggleImpl {
         @Override
         public Drawable getThemeUpIndicator(Activity activity) {
-        	return ActionBarToggleCompat.getThemeUpIndicator(activity);
+            return null;
         }
 
         @Override
         public Object setActionBarUpIndicator(Object info, Activity activity,
                 Drawable themeImage, int contentDescRes) {
-        	return ActionBarToggleCompat.setActionBarUpIndicator(info, activity,
-                    themeImage, contentDescRes);
+            // No action bar to set.
+            return info;
         }
 
         @Override
         public Object setActionBarDescription(Object info, Activity activity, int contentDescRes) {
-        	return ActionBarToggleCompat.setActionBarDescription(info, activity,
-                    contentDescRes);
+            // No action bar to set
+            return info;
         }
     }
 
@@ -108,21 +144,48 @@ public class ActionBarToggle implements DrawerListener, PanelSlideListener {
         }
     }
 
+    private static class ActionBarDrawerToggleImplJellybeanMR2
+            implements ActionBarDrawerToggleImpl {
+        @Override
+        public Drawable getThemeUpIndicator(Activity activity) {
+            return ActionBarToggleJellybeanMR2.getThemeUpIndicator(activity);
+        }
+
+        @Override
+        public Object setActionBarUpIndicator(Object info, Activity activity,
+                Drawable themeImage, int contentDescRes) {
+            return ActionBarToggleJellybeanMR2.setActionBarUpIndicator(info, activity,
+                    themeImage, contentDescRes);
+        }
+
+        @Override
+        public Object setActionBarDescription(Object info, Activity activity, int contentDescRes) {
+            return ActionBarToggleJellybeanMR2.setActionBarDescription(info, activity,
+                    contentDescRes);
+        }
+    }
+
     private static final ActionBarDrawerToggleImpl IMPL;
 
     static {
         final int version = Build.VERSION.SDK_INT;
-        if (version >= 11) {
+        if (version >= 18) {
+            IMPL = new ActionBarDrawerToggleImplJellybeanMR2();
+        } else if (version >= 11) {
             IMPL = new ActionBarDrawerToggleImplHC();
         } else {
-            IMPL = new ActionBarDrawerToggleImplCompat();
+            IMPL = new ActionBarDrawerToggleImplBase();
         }
     }
+
+    /** Fraction of its total width by which to offset the toggle drawable. */
+    private static final float TOGGLE_DRAWABLE_OFFSET = 1 / 3f;
 
     // android.R.id.home as defined by public API in v11
     private static final int ID_HOME = 0x0102002c;
 
     private final Activity mActivity;
+    private final Delegate mActivityImpl;
     private final SlidingPaneLayout mSlidingPaneLayout;
     private final DrawerLayout mDrawerLayout;
     private boolean mDrawerIndicatorEnabled = true;
@@ -164,6 +227,14 @@ public class ActionBarToggle implements DrawerListener, PanelSlideListener {
     public ActionBarToggle(Activity activity, ViewGroup layout,
             int drawerImageRes, int openDrawerContentDescRes, int closeDrawerContentDescRes) {
         mActivity = activity;
+        
+        // Allow the Activity to provide an impl
+        if (activity instanceof DelegateProvider) {
+            mActivityImpl = ((DelegateProvider) activity).getDrawerToggleDelegate();
+        } else {
+            mActivityImpl = null;
+        }
+
         if(layout instanceof SlidingPaneLayout){
         	view_type = TYPE.Slider;
             mSlidingPaneLayout = (SlidingPaneLayout) layout;
@@ -188,84 +259,8 @@ public class ActionBarToggle implements DrawerListener, PanelSlideListener {
         mThemeImage = IMPL.getThemeUpIndicator(activity);
         mDrawerImage = activity.getResources().getDrawable(drawerImageRes);
         mSlider = new SlideDrawable(mDrawerImage);
-        mSlider.setOffsetBy(1.f / 3);
+        mSlider.setOffsetBy(TOGGLE_DRAWABLE_OFFSET);
     }
-    
-    protected boolean isViewOpen(){
-    	switch (view_type) {
-		case Slider:
-			return !mSlidingPaneLayout.isOpen();
-			
-		case Drawer:
-        	return mDrawerLayout.isDrawerOpen(GravityCompat.START);
-		}
-		return false;
-    }
-    
-    protected boolean isViewOpenForOptions(){
-    	switch (view_type) {
-		case Slider:
-			return mSlidingPaneLayout.isOpen();
-			
-		case Drawer:
-			return mDrawerLayout.isDrawerOpen(GravityCompat.START);
-		}
-		return false;
-    }
-    
-    public void slideView(View panel, float slideOffset){
-    	onViewSlide(panel, slideOffset);
-    }
-    
-    public void openView(){
-    	switch (view_type) {
-		case Slider:
-			mSlidingPaneLayout.openPane();
-			break;
-			
-		case Drawer:
-			mDrawerLayout.openDrawer(GravityCompat.START);
-        	break;
-		}
-    }
-    
-    public void closeView(){
-    	switch (view_type) {
-		case Slider:
-			mSlidingPaneLayout.closePane();
-			break;
-			
-		case Drawer:
-			mDrawerLayout.closeDrawer(GravityCompat.START);
-        	break;
-		}
-    }
-
-	protected void onViewSlide(View panel, float slideOffset) {
-        float glyphOffset = mSlider.getOffset();
-        if (slideOffset > 0.5f) {
-            glyphOffset = Math.max(glyphOffset, Math.max(0.f, slideOffset - 0.5f) * 2);
-        } else {
-            glyphOffset = Math.min(glyphOffset, slideOffset * 2);
-        }
-        mSlider.setOffset(glyphOffset);
-	}
-
-	protected void onViewOpened(View panel) {
-        mSlider.setOffset(1.f);
-        if (mDrawerIndicatorEnabled) {
-            mSetIndicatorInfo = IMPL.setActionBarDescription(mSetIndicatorInfo, mActivity,
-                    mOpenDrawerContentDescRes);
-        }
-	}
-
-	protected void onViewClosed(View panel) {
-        mSlider.setOffset(0.f);
-        if (mDrawerIndicatorEnabled) {
-            mSetIndicatorInfo = IMPL.setActionBarDescription(mSetIndicatorInfo, mActivity,
-                    mCloseDrawerContentDescRes);
-        }
-	}
 
     /**
      * Synchronize the state of the drawer indicator/affordance with the linked DrawerLayout.
@@ -352,7 +347,7 @@ public class ActionBarToggle implements DrawerListener, PanelSlideListener {
      * @param item the MenuItem instance representing the selected menu item
      * @return true if the event was handled and further processing should not occur
      */
-    public boolean onOptionsItemSelected(com.actionbarsherlock.view.MenuItem item) {
+    /*public boolean onOptionsItemSelected(com.actionbarsherlock.view.MenuItem item) {
         if (item != null && item.getItemId() == ID_HOME && mDrawerIndicatorEnabled) {
             if (isViewOpenForOptions()) {
                 closeView();
@@ -361,7 +356,7 @@ public class ActionBarToggle implements DrawerListener, PanelSlideListener {
             }
         }
         return false;
-    }
+    }*/
     
     /**
      * This method should be called by your <code>Activity</code>'s
@@ -468,6 +463,22 @@ public class ActionBarToggle implements DrawerListener, PanelSlideListener {
 	public void onDrawerStateChanged(int newState) {
 		
 	}
+	
+    Drawable getThemeUpIndicator() {
+        if (mActivityImpl != null) {
+            return mActivityImpl.getThemeUpIndicator();
+        }
+        return IMPL.getThemeUpIndicator(mActivity);
+    }
+
+    void setActionBarUpIndicator(Drawable upDrawable, int contentDescRes) {
+        if (mActivityImpl != null) {
+            mActivityImpl.setActionBarUpIndicator(upDrawable, contentDescRes);
+            return;
+        }
+        mSetIndicatorInfo = IMPL
+                .setActionBarUpIndicator(mSetIndicatorInfo, mActivity, upDrawable, contentDescRes);
+    }
 
     private static class SlideDrawable extends Drawable implements Drawable.Callback {
         private Drawable mWrapped;
@@ -641,4 +652,87 @@ public class ActionBarToggle implements DrawerListener, PanelSlideListener {
             }
         }
     }
+    
+    protected boolean isViewOpen(){
+    	switch (view_type) {
+		case Slider:
+			return !mSlidingPaneLayout.isOpen();
+			
+		case Drawer:
+        	return mDrawerLayout.isDrawerOpen(GravityCompat.START);
+		default:
+			return false;
+		}
+    }
+    
+    protected boolean isViewOpenForOptions(){
+    	switch (view_type) {
+		case Slider:
+			return mSlidingPaneLayout.isOpen();
+			
+		case Drawer:
+			return mDrawerLayout.isDrawerOpen(GravityCompat.START);
+		default:
+			return false;
+		}
+    }
+    
+    public void slideView(View panel, float slideOffset){
+    	onViewSlide(panel, slideOffset);
+    }
+    
+    public void openView(){
+    	switch (view_type) {
+		case Slider:
+			mSlidingPaneLayout.openPane();
+			break;
+			
+		case Drawer:
+			mDrawerLayout.openDrawer(GravityCompat.START);
+        	break;
+		default:
+			break;
+		}
+    }
+    
+    public void closeView(){
+    	switch (view_type) {
+		case Slider:
+			mSlidingPaneLayout.closePane();
+			break;
+			
+		case Drawer:
+			mDrawerLayout.closeDrawer(GravityCompat.START);
+        	break;
+		default:
+			break;
+		}
+    }
+
+	protected void onViewSlide(View panel, float slideOffset) {
+        float glyphOffset = mSlider.getOffset();
+        if (slideOffset > 0.5f) {
+            glyphOffset = Math.max(glyphOffset, Math.max(0.f, slideOffset - 0.5f) * 2);
+        } else {
+            glyphOffset = Math.min(glyphOffset, slideOffset * 2);
+        }
+        mSlider.setOffset(glyphOffset);
+	}
+
+	protected void onViewOpened(View panel) {
+        mSlider.setOffset(1.f);
+        if (mDrawerIndicatorEnabled) {
+            mSetIndicatorInfo = IMPL.setActionBarDescription(mSetIndicatorInfo, mActivity,
+                    mOpenDrawerContentDescRes);
+        }
+	}
+
+	protected void onViewClosed(View panel) {
+        mSlider.setOffset(0.f);
+        if (mDrawerIndicatorEnabled) {
+            mSetIndicatorInfo = IMPL.setActionBarDescription(mSetIndicatorInfo, mActivity,
+                    mCloseDrawerContentDescRes);
+        }
+	}
+
 }

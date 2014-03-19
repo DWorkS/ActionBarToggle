@@ -22,17 +22,16 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-
 import dev.dworks.libs.actionbartoggle.ActionBarToggle;
 
 
-public class ViewActivity extends SherlockFragmentActivity {
+public class ViewActivity extends ActionBarActivity {
     private ActionBarToggle mActionBarToggle;
 
     private String[] mPlanetTitles;
@@ -64,8 +63,8 @@ public class ViewActivity extends SherlockFragmentActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(com.actionbarsherlock.view.Menu menu) {
-    	getSupportMenuInflater().inflate(R.menu.search, menu);
+    public boolean onCreateOptionsMenu(Menu menu) {
+    	getMenuInflater().inflate(R.menu.search, menu);
     	return super.onCreateOptionsMenu(menu);
     }
 

@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2013 The Android Open Source Project
- * Copyright (C) 2013 Hari Krishna Dulipudi
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,8 +36,8 @@ import android.widget.ImageView;
  * in an action bar without some really gross hacks. Since the MR2 SDK is not published as of
  * this writing, the new API is accessed via reflection here if available.
  */
-public class ActionBarToggleHoneycomb {
-    private static final String TAG = "SherlockActionBarDrawerToggleHoneycomb";
+class ActionBarToggleHoneycomb {
+    private static final String TAG = "ActionBarDrawerToggleHoneycomb";
 
     private static final int[] THEME_ATTRS = new int[] {
             R.attr.homeAsUpIndicator
