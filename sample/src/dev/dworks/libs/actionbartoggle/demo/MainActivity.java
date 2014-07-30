@@ -65,7 +65,8 @@ public class MainActivity extends ActionBarActivity implements OnItemClickListen
 			ActivityInfo[] aInfos = pInfo.activities;
 
 			for (ActivityInfo aInfo : aInfos) {
-				if (!thisClazzName.equals(aInfo.name) && !aInfo.name.endsWith("AboutActivity")) {
+				if (!thisClazzName.equals(aInfo.name) && !aInfo.name.endsWith("AboutActivity")
+						&& !aInfo.name.endsWith("AdActivity")) {
 					items.add(aInfo);
 				}
 			}
